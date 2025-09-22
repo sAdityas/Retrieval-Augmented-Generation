@@ -1,35 +1,80 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+  import React, { useState } from "react";
+  import "./App.css"
 
-function App() {
-  const [count, setCount] = useState(0)
+  function App() {
+    const [query, setQuery] = useState("");
+    const [answer, setAnswer] = useState("");
+    const [clicked, setClicked] = useState(false)
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    const readAndDecode = async (res) => {
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      while(true) {
+        const{ value,done } = await reader.read();
+        if (done) break;
+        setAnswer((prev) => prev + decoder.decode(value, { stream: true }))
+      }
+    }
+
+    const handleSubmit = async (e) => {
+      !setClicked(true)
+      e.preventDefault();
+
+      // reset answer each time
+      setAnswer("");
+
+      // 🔹 Send query via POST first
+      const response = await fetch("http://localhost:5000/rag-query", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query }),
+      }) 
+      await readAndDecode(response)
+      
+    };
+
+    return (
+      <div className="h-screen w-screen bg-black flex flex-col justify-center items-center text-white">
+        <form
+          className=""
+          onSubmit={handleSubmit}
+        >
+          <input
+            className="min-w-[50vh] border-2 border-spacing-1 border-solid border-white bg-black p-1 m-2"
+            value={query}
+            placeholder="Enter your query here..."
+            onChange={(e) => setQuery(e.target.value)}
+          />
+          <button
+            className="border-2 border-solid border-black p-1 m-2"
+            type="submit"
+          >
+            Submit
+          </button>
+        </form>
+        <div className="max-w-[70vw] min-h-[10vh] justify-center items-center bg-black">
+          {!answer && clicked ? (
+            <div> Drink Some Coffee
+            <div class="center">
+            <div class="wave"></div>
+            <div class="wave"></div>
+            <div class="wave"></div>
+            <div class="wave"></div>
+            <div class="wave"></div>
+            <div class="wave"></div>
+            <div class="wave"></div>
+            <div class="wave"></div>
+            <div class="wave"></div>
+            <div class="wave"></div>
+          </div>
+          </div>
+          ):
+          (
+            <p>{answer}</p>
+          )}
+        </div>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    );
+  }
 
-export default App
+  export default App;

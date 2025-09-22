@@ -16,10 +16,10 @@ def llm_generate(prompt, stream=True, model="mistral"):
         ):
             if "message" in chunk and "content" in chunk["message"]:
                 text = chunk["message"]["content"]  # print as tokens arrive
-                print(text, end="", flush=True)
-                response_text += text
+                # print(text, end="", flush=True)
+                # response_text += text
         print()  # final newline
-        return response_text
+        return text
     else:
         response = ollama.chat(
             model=model,

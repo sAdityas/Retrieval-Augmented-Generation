@@ -4,7 +4,8 @@ import pickle
 import hashlib
 import time
 import pandas as pd
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, Response, stream_with_context
+from flask_cors import CORS
 
 from retriever import Retriever
 from bm25_retriever import BM25Retriever
@@ -18,6 +19,7 @@ from llm import llm_generate
 # 1. Flask Setup
 # ----------------------------
 app = Flask(__name__)
+CORS(app)
 
 # ----------------------------
 # 2. Environment Setup
@@ -187,13 +189,13 @@ def rag_query():
         f"Answer the question based on this context:\n{combined_content}\n\nQuestion: {query}",
         stream=False
     )
-
+    def generate(answer):
+        for word in answer:
+            yield word
+            time.sleep(0.05)
     elapsed = time.time() - start_time
 
-    return jsonify({
-        "answer": answer,
-        "Time Required": elapsed
-    })
+    return Response(stream_with_context(generate(answer)), mimetype="text/event-stream")
 
 # ----------------------------
 # 7. Run Flask App
