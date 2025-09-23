@@ -210,8 +210,8 @@ def rag_query():
              {combined_content} 
             Current Question: 
             {query}
-            If you do not know the answer from the provided context say:
-            ` I do not know the answer. Can you please provide more context or more detailed information about the error `""", stream=False)
+            If you do not know the answer from the provided context say or if it's not related to SAP:
+            I do not know the answer or this is issue is not from SAP. Provide Query Related to SAP or Provide more context""", stream=False)
     # answer = llm_generate(f"""""" )
     
     SESSION_MEMORY[session_id].append({"query": query, "answer": answer})
