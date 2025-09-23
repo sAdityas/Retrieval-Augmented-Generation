@@ -54,3 +54,22 @@
     transform: scale(0);
   }
 }
+
+
+.user-msg{
+  margin-top: 1rem;
+  background: #181818;
+  align-self: flex-start;
+  border-radius: 1rem;
+  width: 70%;
+  padding: 0.5rem;
+}
+
+.bot-msg{
+  margin-top:1rem;
+  background: #141414;
+  align-self: flex-end;
+  border-radius: 1rem;
+  max-width: 70%;
+  padding: 0.5rem;
+}

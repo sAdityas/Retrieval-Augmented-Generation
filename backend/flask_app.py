@@ -1,4 +1,4 @@
-# app.py - Flask API for Level 7 RAG
+# Flask API for Level 9 RAG with chat history upto n ( 3-5 ) contexts of past answer and queries
 import os
 import pickle
 import hashlib
@@ -6,6 +6,7 @@ import time
 import pandas as pd
 from flask import Flask, request, jsonify, Response, stream_with_context
 from flask_cors import CORS
+from collections import deque, defaultdict
 
 from retriever import Retriever
 from bm25_retriever import BM25Retriever
@@ -20,6 +21,14 @@ from llm import llm_generate
 # ----------------------------
 app = Flask(__name__)
 CORS(app)
+
+
+# ----------------------------
+# Initializing Dictionary 
+#-----------------------------
+
+SESSION_MEMORY = defaultdict(lambda: deque(maxlen=5))
+
 
 # ----------------------------
 # 2. Environment Setup
@@ -149,14 +158,18 @@ reranker = reRanker()
 def rag_query():
     data = request.json
     query = data.get("query")
+    session_id = data.get("session_id","default")
     if not query:
         return jsonify({"error": "Missing query"}), 400
 
     start_time = time.time()
 
-    # rewritten = rewrite_query(query)
+    # Get Memory
+    history = list(SESSION_MEMORY[session_id])
+    history_text = "\n".join([f"User: {h['query']} \n Bot: {h['answer']}" for h in history])
+    
+    # Retrieval
     top_k = adaptive_top_k(query)
-
     retrieved_docs = hybrid_retriever.retrieve(query, top_k=top_k)
     raw_docs = [doc for doc, _ in retrieved_docs]
     deduped_docs = deduper.deduplicate(raw_docs)
@@ -185,20 +198,43 @@ def rag_query():
     #         stream=False
     #     )
     # else:
-    answer = llm_generate(
-        f"Answer the question based on this context:\n{combined_content}\n\nQuestion: {query} IF YOU DO NOT KNOW THE ANSWER FROM THE CONTEXT DO NOT PROVIDE ANY ANSWER JUSY SAY `I do not know the answer for this can you please provide detailed information`",
-        stream=False
-    )
-    def generate(answer):
-        for word in answer:
-            yield word
-            time.sleep(0.05)
-    elapsed = time.time() - start_time
 
-    return Response(stream_with_context(generate(answer)), mimetype="text/event-stream")
+
+
+    # Prompt With Memory
+
+    answer = llm_generate(f""" You are a very helpful SAP Troubleshotting assistant
+             Conversation So Far:
+              {history_text}
+            Context From Retrieved Text:
+             {combined_content} 
+            Current Question: 
+            {query}
+            If you do not know the answer from the provided context say:
+            ` I do not know the answer. Can you please provide more context or more detailed information about the error `""", stream=False)
+    # answer = llm_generate(f"""""" )
+    
+    SESSION_MEMORY[session_id].append({"query": query, "answer": answer})
+    def generate_chunks(answer, chunk_size):
+        for i in range(0, len(answer), chunk_size):
+            yield answer[i:i+chunk_size].encode("utf-8")  # 🔹 must encode to bytes
+            time.sleep(0.05)
+            print(answer[i:i+chunk_size])
+    return Response(stream_with_context(generate_chunks(answer ,5)), mimetype="application/octet-stream")
+
+@app.route("/test-stream", methods=["POST"])
+def test_stream():
+    def generate():
+        text = "Hello! This is a streaming test.Hello! This is a streaming test.Hello! This is a streaming test.Hello! This is a streaming test.Hello! This is a streaming test.Hello! This is a streaming test.Hello! This is a streaming test.Hello! This is a streaming test.Hello! This is a streaming test.Hello! This is a streaming test.Hello! This is a streaming test.Hello! This is a streaming test.Hello! This is a streaming test.Hello! This is a streaming test.Hello! This is a streaming test.Hello! This is a streaming test.Hello! This is a streaming test.Hello! This is a streaming test."
+        for i in range(0, len(text), 5):
+            yield text[i:i+5].encode("utf-8")
+            time.sleep(0.1)
+    return Response(generate(), mimetype="application/octet-stream")
+
+
 
 # ----------------------------
 # 7. Run Flask App
 # ----------------------------
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True, use_reloader=False)
+    app.run(host="0.0.0.0", port=5000, debug=True, use_reloader=True)
