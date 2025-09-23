@@ -186,7 +186,7 @@ def rag_query():
     #     )
     # else:
     answer = llm_generate(
-        f"Answer the question based on this context:\n{combined_content}\n\nQuestion: {query}",
+        f"Answer the question based on this context:\n{combined_content}\n\nQuestion: {query} IF YOU DO NOT KNOW THE ANSWER FROM THE CONTEXT DO NOT PROVIDE ANY ANSWER JUSY SAY `I do not know the answer for this can you please provide detailed information`",
         stream=False
     )
     def generate(answer):
