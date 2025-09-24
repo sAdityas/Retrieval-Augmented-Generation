@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import "./AI.css";
 import { FontAwesomeIcon as FontAwesome } from "@fortawesome/react-fontawesome";
 import { faArrowLeft  as faBack } from "@fortawesome/free-solid-svg-icons";
@@ -7,18 +6,17 @@ import Loader from "../components/Loader";
 import Welcome from "../components/Welcome";
 import InputForm from "../components/InputForm";
 import Chat from "../components/Chat";
+import '../App'
 
 
 
-
-function AI() {
+function AI({ onNavigate }) {
   const [query, setQuery] = useState("");
   const [sessionId, setSessionId] = useState("");
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showWelcome, setShowWelcome] = useState(true);
   const [submitted, setSubmitted] = useState(false);
-  const navigate = useNavigate();
   const name = sessionStorage.getItem("username") || "";
   let welcomeText = ("Hi " + name + ", What is your query?")
 
@@ -65,6 +63,8 @@ function AI() {
     }
   };
 
+  const handleBack = () => {if(onNavigate) onNavigate()}
+
   // Handle user submit
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -85,12 +85,12 @@ function AI() {
   };
 
   return (
-    <div className="h-screen w-full flex flex-col justify-between items-center text-white">
+    <div id="chat-container" className="h-screen w-full flex flex-col justify-between items-center text-white">
       {/* Home Button */}
-      <div className="flex w-full mt-2 left-0">
+      <div className="self-start  mt-2 ml-2">
         <button
-          className="border border-red-500 p-2 rounded-full font-extralight font-sans text-2xl"
-          onClick={() => setTimeout(() => navigate("/", { replace: true }), 200)}
+          className="p-2 rounded-full font-extralight font-sans text-l"
+          onClick={handleBack}
         ><FontAwesome icon={ faBack } ></FontAwesome>  
         </button>
       </div>

@@ -1,5 +1,5 @@
 #Loader-Container {
-    animation: fadein 1s ease-in forwards; /* faster, smoother */
+    animation: fadein 1.4s ease-in forwards; /* faster, smoother */
     opacity: 0; /* start hidden */
   }
   
@@ -10,6 +10,6 @@
     }
     to {
       opacity: 1;
-      transform: translateY(0);
+      transform: translateY(-30px);
     }
   }

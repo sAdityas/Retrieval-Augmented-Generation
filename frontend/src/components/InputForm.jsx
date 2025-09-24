@@ -14,21 +14,21 @@ function InputForm({ handleSubmit, query, setQuery, loading, submitted }) {
       onChange={(e) => setQuery(e.target.value)}
     />
     <button
-      className="relative border-2 border-white p-6 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed ml-2 flex items-center justify-center"
+      className="relative border-2 border-white  px-4 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed ml-2 flex items-center justify-center"
       type="submit"
       disabled={query.length < 2 || loading}
     >
       {/* Reply Icon */}
       <FontAwesome
         icon={faReply}
-        className={`absolute transition-all duration-300 text-xl ${
+        className={`absolute transition-all duration-300 text-l ${
           submitted ? "opacity-0 scale-50" : "opacity-100 scale-100"
         }`}
       />
       {/* Check Icon */}
       <FontAwesome
         icon={faCheck}
-        className={`absolute transition-all duration-300 text-xl ${
+        className={`absolute transition-all duration-300 text-l ${
           submitted ? "opacity-100 scale-100" : "opacity-0 scale-50"
         }`}
       />
