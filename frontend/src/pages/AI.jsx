@@ -1,6 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./AI.css";
+import { FontAwesomeIcon as FontAwesome } from "@fortawesome/react-fontawesome";
+import { faArrowLeft  as faBack } from "@fortawesome/free-solid-svg-icons";
+import Loader from "../components/Loader";
+import Welcome from "../components/Welcome";
+import InputForm from "../components/InputForm";
+import Chat from "../components/Chat";
+
+
+
 
 function AI() {
   const [query, setQuery] = useState("");
@@ -12,12 +21,6 @@ function AI() {
   const navigate = useNavigate();
   const name = sessionStorage.getItem("username") || "";
   let welcomeText = ("Hi " + name + ", What is your query?")
-
-  // Scroll chat to bottom
-  useEffect(() => {
-    const chatDiv = document.getElementById("chat-container");
-    if (chatDiv) chatDiv.scrollTop = chatDiv.scrollHeight;
-  }, [messages]);
 
   // Initialize session ID
   useEffect(() => {
@@ -52,8 +55,10 @@ function AI() {
         if (last?.role === "Bot") {
           const updated = [...prev];
           updated[updated.length - 1] = { ...last, text: StreamAnswer };
+          setSubmitted(false)
           return updated;
         } else {
+          setSubmitted(false)
           return [...prev, { role: "Bot", text: StreamAnswer }];
         }
       });
@@ -86,77 +91,21 @@ function AI() {
         <button
           className="border border-red-500 p-2 rounded-full font-extralight font-sans text-2xl"
           onClick={() => setTimeout(() => navigate("/", { replace: true }), 200)}
-        >
-          🔙
+        ><FontAwesome icon={ faBack } ></FontAwesome>  
         </button>
       </div>
-
       {/* Welcome message */}
-      {showWelcome && (
-        <div>
-          {welcomeText.split("").map((char, i) => (
-            <span
-              key={i}
-              className={`welcome-msg ${submitted ? "fade-text" : ""}`}
-              style={{
-                animationDelay: submitted ? `${i * 0.04}s` : `${i * 0.09}s`,
-              }}
-            >
-              {char}
-            </span>
-          ))}
-        </div>
-      )}
-
+      <Welcome showWelcome={showWelcome} welcomeText={welcomeText} submitted={submitted} />
       {/* Chat messages */}
-      <div
-        id="chat-container"
-        className="chat-container w-[90%] flex-1 overflow-y-auto flex flex-col gap-2 p-4 mt-3"
-      >
-        {messages.map((m, i) => (
-          <p
-            key={i}
-            className={`chats p-2 rounded-xl max-w-[70%] whitespace-pre-wrap ${
-              m.role === "user" ? "user-msg" : "bot-msg"
-            }`}
-          >
-            <b>{m.role}:</b> {m.text}
-          </p>
-        ))}
-      </div>
-
-      {/* Loader */}
-      {loading && (
-        <div className="mb-2 text-center text-white">
-          <div>
-            ☕ Drink Some Coffee<g>.</g><g>.</g><g>.</g>
-            <div className="center">
-              {[...Array(10)].map((_, i) => (
-                <div key={i} className="wave" style={{ animationDelay: `${i * 0.1}s` }}></div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
+      <Chat messages={messages} />
+     <Loader loading={loading} />
       {/* Input form */}
-      <div className="w-full p-4 bg-gray-900 flex justify-center">
-        <form className="flex w-full max-w-[600px]" onSubmit={handleSubmit}>
-          <input
-            className="flex-1 border-2 rounded-2xl border-white bg-black text-white p-2"
-            value={query}
-            placeholder="Enter your query here..."
-            onChange={(e) => setQuery(e.target.value)}
-          />
-          <button
-            className="border-2 border-white p-2 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed ml-2"
-            type="submit"
-            disabled={query.length < 5 || loading}
-          >
-            Submit
-          </button>
-        </form>
-      </div>
+      <InputForm 
+        handleSubmit={handleSubmit}
+        query={query}
+        setQuery={setQuery}
+        loading={loading}
+        submitted={submitted} />
     </div>
   );
 }

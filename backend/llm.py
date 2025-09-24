@@ -1,7 +1,7 @@
 import ollama
 import time
 
-def llm_generate(prompt, stream=True, model="mistral"):
+def llm_generate(prompt, stream=True, model="mistral:7b-instruct-q4_0"):
     """
     Sends a prompt to Ollama LLM and returns the response.
     Streams output if stream=True.

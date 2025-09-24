@@ -12,23 +12,36 @@
     transform: translateY(-10px);
   }
 }
-
-/* Loader waves */
 .center {
+  opacity: 0;
   margin-top: 3em;
   height: 30px;
   display: flex;
   justify-content: center;
   align-items: center;
   background: #000;
+  animation: fadein 2s linear forwards;
 }
+
+@keyframes fadein {
+  from {
+    opacity: 0;
+  }
+  to{
+    opacity: 1;
+  }
+}
+
+
+/* Loader waves */
+
 .wave {
-  width: 3px;
-  height: 20px;
-  background: linear-gradient(45deg, rgb(255, 255, 255), #fff);
-  margin: 10px;
-  animation: wave 1s linear infinite;
-  border-radius: 20px;
+width: 3px;
+height: 20px;
+background: linear-gradient(45deg, rgb(255, 255, 255), #fff);
+margin: 10px;
+animation: wave 1s linear infinite;
+border-radius: 20px;
 }
 .wave:nth-child(2) { animation-delay: 0.1s; }
 .wave:nth-child(3) { animation-delay: 0.2s; }
@@ -41,16 +54,14 @@
 .wave:nth-child(10){ animation-delay: 0.9s; }
 
 @keyframes wave {
-  0% { transform: scale(0); }
-  50% { transform: scale(1); }
-  100% { transform: scale(0); }
+0% { transform: scale(0); }
+50% { transform: scale(1); }
+100% { transform: scale(0); }
 }
 
-/* Animated dots (g) */
-g {
-  opacity: 0;
-  animation: mkvisible 3s linear infinite;
-}
+
+
+
 g:nth-child(2) { animation-delay: 0.2s; }
 g:nth-child(3) { animation-delay: 0.4s; }
 g:nth-child(4) { animation-delay: 0.6s; }
@@ -64,7 +75,7 @@ g:nth-child(4) { animation-delay: 0.6s; }
 .user-msg {
   margin-top: 1rem;
   background: #181818;
-  align-self: flex-start;
+  align-self: flex-end;
   border-radius: 1rem;
   width: 70%;
   padding: 0.5rem;
@@ -72,7 +83,7 @@ g:nth-child(4) { animation-delay: 0.6s; }
 .bot-msg {
   margin-top: 1rem;
   background: #141414;
-  align-self: flex-end;
+  align-self: flex-start;
   border-radius: 1rem;
   max-width: 70%;
   padding: 0.5rem;
@@ -88,7 +99,7 @@ g:nth-child(4) { animation-delay: 0.6s; }
 .chat-container {
   opacity: 0;
   animation: comein 2s ease-in forwards;
-  animation-delay: 0.5s;
+  animation-delay: 1.6s;
 }
 
 @keyframes comein {
@@ -98,9 +109,27 @@ g:nth-child(4) { animation-delay: 0.6s; }
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(-30vh);
   }
 }
+
+.welcome-container{
+  opacity: 1;
+  animation-delay: 5s;
+  animation: moveThis 2s ease-in forwards;
+}
+
+@keyframes moveThis {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-500px);
+  }
+}
+
 
 /* Welcome message styling */
 .welcome-msg {

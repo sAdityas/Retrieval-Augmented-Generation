@@ -157,8 +157,8 @@ reranker = reRanker()
 @app.route("/rag-query", methods=["POST"])
 def rag_query():
     data = request.json
-    query = data.get("query")
-    session_id = data.get("session_id","default")
+    query = data.get("query") #type: ignore
+    session_id = data.get("session_id","default") #type: ignore
     if not query:
         return jsonify({"error": "Missing query"}), 400
 
@@ -203,15 +203,31 @@ def rag_query():
 
     # Prompt With Memory
 
-    answer = llm_generate(f""" You are a very helpful SAP Troubleshotting assistant
-             Conversation So Far:
-              {history_text}
-            Context From Retrieved Text:
-             {combined_content} 
-            Current Question: 
-            {query}
-            If you do not know the answer from the provided context say or if it's not related to SAP:
-            I do not know the answer or this is issue is not from SAP. Provide Query Related to SAP or Provide more context""", stream=False)
+    answer = llm_generate(f"""
+    You are an  SAP Troubleshooting Assistant.
+
+    Your role:
+    - Use the retrieved SAP documentation and conversation history to answer the user's question.
+    - If the retrieved context does not contain the answer, or if the question is not related to SAP, reply with:
+    "I do not know the answer from the provided context. Please provide more details or clarify your SAP-related issue."
+
+    Guidelines:
+    - Be concise but precise.
+    - When possible, give step-by-step solutions (T-Codes, configuration paths, or troubleshooting actions).
+    - Avoid making up answers not supported by the retrieved context.
+
+    Conversation so far:
+    {history_text}
+
+    Retrieved context:
+    {combined_content}
+
+    Current user question:
+    {query}
+
+    Final Answer:
+    """, stream=False)
+
     # answer = llm_generate(f"""""" )
     
     SESSION_MEMORY[session_id].append({"query": query, "answer": answer})
