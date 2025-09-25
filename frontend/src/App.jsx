@@ -1,43 +1,35 @@
-import React, { useRef, useEffect } from "react";
+import React from "react";
 import Home from "./pages/Home";
 import AI from "./pages/AI";
 import "./App.css";
 
 function App() {
-  const homeRef = useRef(null);
-  const aiRef = useRef(null);
+  const scrollWithLock = (targetId) => {
+    const section = document.getElementById(targetId);
+    if (!section) return;
 
+    const original = document.body.style.overflow;
+    document.body.style.overflow = "hidden"; // lock scroll
 
-  useEffect(() => {
-    const originalStyle = window.getComputedStyle(document.body).overflow;
-    document.body.style.overflow = "hidden"; // stop scrolling
+    // Use window.scrollTo for consistent behavior
+    window.scrollTo({
+      top: section.offsetTop,
+      behavior: "smooth",
+    });
 
-    return () => {
-      document.body.style.overflow = originalStyle; // restore on unmount
-    };
-  }, []);
-  // Scroll to AI
-  const scrollToAI = () => {
-    if (aiRef.current) {
-      aiRef.current.scrollIntoView({ behavior: "smooth" });
-    }
-  };
-
-  // Scroll back to Home
-  const scrollToHome = () => {
-    if (homeRef.current) {
-      homeRef.current.scrollIntoView({ behavior: "smooth" });
-    }
+    setTimeout(() => {
+      document.body.style.overflow = original; // restore scroll
+    }, 800); // match animation duration
   };
 
   return (
-    <div className="scrollAnimate flex flex-col text-white">
-      <div ref={homeRef} className="h-screen w-full">
-        <Home onNavigate={scrollToAI} />
-      </div>
-      <div ref={aiRef} className="h-screen w-full">
-        <AI onNavigate={scrollToHome} />
-      </div>
+    <div className="scrollAnimate text-white">
+      <section id="home" className="h-screen w-full">
+        <Home onNavigate={() => scrollWithLock("chat")} />
+      </section>
+      <section id="chat" className="h-screen w-full">
+        <AI onNavigate={() => scrollWithLock("home")} />
+      </section>
     </div>
   );
 }

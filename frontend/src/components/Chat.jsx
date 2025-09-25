@@ -4,7 +4,7 @@ function Chat({messages}) {
   return (
     <div
         id="chat-container"
-        className="chat-container w-[90%] flex-1 overflow-y-auto flex flex-col gap-2 p-4 mt-3"
+        className="chat-container w-[90%] flex-1 overflow-y-auto flex flex-col gap-2 p-4 mt-3 "
       >
         {messages.map((m, i) => (
           <p
