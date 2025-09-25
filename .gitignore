@@ -8,11 +8,6 @@
 *.npy
 
 # Hash Files
-file_hash.txt
-
-excel_hash.txt
-
-pdf_hash.txt
 
 # Frontend
 
